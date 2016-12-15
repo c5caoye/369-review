@@ -296,7 +296,7 @@ Abstract data types that provides synchronization
 * A lock has a "owner" and can only be released by its owner.
 
 ## A Lock Implementation
-'''C
+```C
 boolean lock;
 void acquire(boolean *lock) {
     while (test_and_set(lock));
@@ -305,8 +305,8 @@ void acquire(boolean *lock) {
 void release(boolean *lock) {
     *lock = false;
 }
-'''
-This is a **spinlock**  
+```
+This is a **spinlock**  
     Uses **busy waiting**
 
 ### Swap (or Exchange) instruction
