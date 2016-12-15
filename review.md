@@ -10,7 +10,7 @@
 
 ## Storage Hierarchy
 * caches can be installed to hide performance differences when there is a large access-time gap between two levels.
-![](./img/Storage_hie.PNG)
+![](./img/storage_hie.PNG)
 
 ## Major OS "Themes"
 * Virtualization
