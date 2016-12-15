@@ -10,7 +10,7 @@
 
 ## Storage Hierarchy
 * caches can be installed to hide performance differences when there is a large access-time gap between two levels.
-![](./img/Storage_hie.PNG)
+![](./img/storage_hie.PNG)
 
 ## Major OS "Themes"
 * Virtualization
@@ -261,6 +261,7 @@ Each thread sets own flag to true and enters CS.
     * Spin waiting while turn is self AND other has flag set
     * If both threads try to enter their CS at the same time, turn will be set to both 0 and 1 at roughly the same time. Only one of these assignments will last. The final value of turn decides which of the two threads is allowed to enter CS first.
 
+
 ```C
 int turn;
 int flags[2];
@@ -274,7 +275,6 @@ My_work(id_t id) {
     flag[id] = false;
     ...
 }
-
 ```
 
 ## Bakery Algorithm
@@ -296,7 +296,8 @@ Abstract data types that provides synchronization
 * A lock has a "owner" and can only be released by its owner.
 
 ## A Lock Implementation
-'''C
+
+```C
 boolean lock;
 void acquire(boolean *lock) {
     while (test_and_set(lock));
@@ -305,7 +306,7 @@ void acquire(boolean *lock) {
 void release(boolean *lock) {
     *lock = false;
 }
-'''
+```
 This is a **spinlock**  
     Uses **busy waiting**
 
