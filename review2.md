@@ -201,3 +201,125 @@ int remove_from_buff(buf_t *b) {
 * The more CPU time a thread accumulates, the lower its priority becomes.
 * Aging prevents starvation.
 * New Unixes reschedule threads every 0.1 seconds and recompute priorities every second.
+
+
+# Memory management
+## Goals:
+1. Efficiency
+2. Transparency
+3. Protection and sharing
+
+* Internal Fragmentation
+    * If process is smaller than partition.
+* External Fragmentation
+    * Hole that is too small to be reused when a process terminates
+* Overlays
+    * If process needs more than partition.
+
+## Fixed partitioning
+* Internal Fragmentation
+* Overlays
+* Number of partitions is limited.
+
+## Dynamic Partitioning
+* External Fragmentation
+* OS may move processes around to create larger chunks of free space (compaction)
+    * Requires processes to be relocatable
+* Need to know maximum size of process at load time
+
+## Paging
+![](./img/paging.PNG)
+
+Hardware (MMU) converts VAs into PAs using the Page Table.
+Each process running in the OS has its own Page Table
+
+## Page Faults
+* Page table entry indicates that the page is not in memory.
+* How to handle?
+    * OS is responsible for loading page from disk
+    * Process stops until the data is brought into memory.
+    * Page replacement policy is up to the OS.
+
+## Why not too slow?
+* Localized patterns
+    * Temporal locality
+    * Spatial locality
+* Although cost of paging is high, it is infrequent enough to be acceptable
+
+## Protection and sharing
+* Access rights are kept in the page tables
+    * Page tables are in protected OS memory.
+* Allow sharing pages, like read-only library code.
+
+## Translation
+### Requirements:
+* Relocation
+* Logical organization
+* Physical organization
+
+### Address binding
+Address translation is the process of linking variable names to physical locations.
+
+### When are address bound?
+* Compile time
+    * Called _absolute code_
+    * No relocation is possible
+* Load time (static relocation)
+* execution time (dynamic relocation)
+
+## Dynamic relocation
+* Hardware support: 2 registers called base and bound.
+* The executable stores virtual addresses
+* Need bound register to ensure that we don't access outside a process' address space.
+* Base and bound get saved in the PCB when we do a context switch
+
+## Placement Algorithms
+* Best-fit
+    * left-over fragments tend to be small
+* First-fit
+    * Simplest, and often fastest and most efficient
+    * May leave many small fragments near start of memory.
+    * Free space becomes fragmented more rapidly.
+* Worst-fit
+    * Not as good as previous two algorithms
+* Quick-fit
+    * Great for fast allocation, generally harder to coalesce
+
+## Paging
+* Virtual addresses interpreted as **page number + page offset**
+    * **page number = vaddr / page_size**
+    * **page offset = vaddr % page_size**
+* On each memory references, processor MMU translates page# to frame# and adds offset to generate a physical address.
+![](./img/paged_address_translation.PNG)
+![](./img/page_trans_1.PNG)
+
+* 32-bit virtual address, 4K (4096 bytes) page
+    * Page size, virtual address size set by MMU hardware
+    * Offset must be 12 bits (2^12 = 4096)
+    * Leaves 20 bits for virtual page number (VPN)
+
+* Program generates virtual address 0x7468
+    * CPU and MMU see binary 0111 0100 0110 1000
+    * Virtual page is 0x7, offset is 0x468
+* Page table entry 0x7 contains 0x42
+    * Page frame number is 0x42
+    * Virtual page 0x7 is stored in physical frame 0x42
+* **Physical address** = 0x42<<12 + 0x468 = 0x42468
+
+## The Page Table
+* Simplest version
+    * A linear array of page table entries, 1 entry per virtual page.
+    * Stored in **OS memory, attached to process structure**
+    * Virtual page number (VPN) is array index
+    * Allocate enough physical memory (ppages) for entire page table.
+
+### Page Table Entries
+![](./img/page_table_entry.PNG)
+* Modify bit (M)
+* Reference bit (R)
+* Valid bit (V)
+* Protection bits
+* Page frame number (PFN) determines physical page
+
+### Page Limitations
+* Memory required for page table can be large.
